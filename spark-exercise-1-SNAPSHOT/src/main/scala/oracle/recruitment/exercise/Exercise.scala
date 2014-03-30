@@ -81,18 +81,14 @@ object Exercise {
 		
 
 		
-		for (symbolCountPair <- symbolCounts) {
+		symbolCounts.foreach{ case(symbol, count) =>
 		  
 		  result.append("#Closed Price\n")
-		  printStatHeader
+		  result.append("symbol\tminimum\tmaximum\tcount\tmean\tmode\tmedian\tvariance\tstandard deviation\tkurtosis\tIQR\n")
 		  
-		  result.append("symbolCountPair is " + symbolCountPair + "\t")
+		  result.append("symbol is " + symbol + "\t count is " + count)
 
-		  
-
-
-
-		}		
+		}	
 		  		
 		  		
 		  		
