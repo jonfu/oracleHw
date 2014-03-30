@@ -51,6 +51,27 @@ object Exercise {
 		val spark: SparkContext = options.getSparkContext
 
 		// YOUR CONTRIBUTION HERE...
+		
+		
+		var result = new StringBuilder
+		//var result2 = new StringBuilder
+		def printStatHeader(): Unit = { result.append("symbol\tminimum\tmaximum\tcount\tmean\tmode\tmedian\tvariance\tstandard deviation\tkurtosis\tIQR\n") }
+		
+
+	
+
+		//First, we load the file and strip off the header "Sym,Date,Open,High,Low,Close,Volume,Adjusted"
+		var stockFile = spark.textFile(options.inputPath).filter(line=> !line.contains("Sym"))		
+		
+		
+				result.append("#Closed Price\n")
+		  printStatHeader
+		  
+		  		result.append("\n")
+
+		
+		result.append("File count is ")
+		result.append(stockFile.count)
 
 
 
