@@ -1,6 +1,7 @@
 package oracle.recruitment.exercise
 
 import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
 import org.kohsuke.args4j.Option
 import oracle.recruitment.util.{HdfsUtils, Options}
 
@@ -77,9 +78,36 @@ object Exercise {
 
 		// save any results ... example follows
 		HdfsUtils.putHdfsFileText ( options.outputPath + "/" + "test.txt",
-			spark.hadoopConfiguration, "Hello, World!", true )
+			spark.hadoopConfiguration, result.toString, true )
 
 		// stop Spark
 		spark.stop()
 	}
+	
+	
+	// Homework Helper functions
+	
+	def mode(xs: RDD[Double]) : Double = xs.map(value=>(value, 1)).reduceByKey(_+_).map(pair=>pair.swap).sortByKey(false).first._2
+	
+	def median(xs: Array[Double]): Double = xs(xs.size / 2)
+	  
+	def quartiles(xs: Array[Double]): (Double, Double, Double) =
+	  (xs(xs.size / 4), median(xs), xs(xs.size / 4 * 3))
+	  
+	def iqr(xs: Array[Double]): Double = quartiles(xs) match {
+		case (lowerQuartile, _, upperQuartile) => upperQuartile - lowerQuartile
+	}
+	
+	def movingAverage(values: Array[Double], period: Int): List[Double] = {
+	   val first = (values take period).sum / period
+	   val subtract = values map (_ / period)
+	   val add = subtract drop period
+	   val addAndSubtract = add zip subtract map Function.tupled(_ - _)
+	   val res = (addAndSubtract.foldLeft(first :: List.fill(period - 1)(0.0)) { 
+	     (acc, add) => (add + acc.head) :: acc 
+	   }).reverse
+	   res
+	}	
+	
+	
 }
