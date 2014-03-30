@@ -14,7 +14,7 @@ import org.apache.commons.math.stat.correlation.PearsonsCorrelation
 import scala.collection.JavaConversions._
 import scala.io.Source
 
-
+/*
 class MyOptions (args: Array[String]) extends Options {
 	@Option(name = "-sm", usage = "Cluster URL to connect to (e.g. mesos://host:port, spark://host:port, local[4]).")
 	var sparkMaster: String = "local"
@@ -43,16 +43,17 @@ class MyOptions (args: Array[String]) extends Options {
 	initialize ( args )
 }
 
+*/
 
 
 object Exercise {
 	def main ( args: Array[String] ) {
 
 		// options
-		val options: MyOptions = new MyOptions ( args )
+		//val options: MyOptions = new MyOptions ( args )
 
 		// spark context
-		val spark: SparkContext = options.getSparkContext
+		val spark: SparkContext = new SparkContext("local", "big data try run", "", Seq(""))
 
 		// YOUR CONTRIBUTION HERE...
 		
@@ -65,7 +66,7 @@ object Exercise {
 	
 
 		//First, we load the file and strip off the header "Sym,Date,Open,High,Low,Close,Volume,Adjusted"
-		var stockFile = spark.textFile(options.inputPath).filter(line=> !line.contains("Sym"))
+		var stockFile = spark.textFile("/oraclebigdata/stocks.csv").filter(line=> !line.contains("Sym"))
 		
 		//Now, transform it into tuples and cache it
 		var stockTuples = stockFile.map(line=>line.split(",")).cache
@@ -77,7 +78,7 @@ object Exercise {
 		
 		result.append("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
 		
-		result.append(symbolCounts.take(5))
+		result.append(symbolCounts.take(5).foreach(println))
 		
 
 		
@@ -88,7 +89,7 @@ object Exercise {
 		  
 		  result.append("symbol is " + symbol + "\t count is " + count)
 
-		}	
+		}
 		  		
 		  		
 		  		
@@ -111,7 +112,7 @@ object Exercise {
 
 
 		// save any results ... example follows
-		HdfsUtils.putHdfsFileText ( options.outputPath + "/" + "test.txt",
+		HdfsUtils.putHdfsFileText ( "/oraclebigdata/test.txt",
 			spark.hadoopConfiguration, result.toString, true )
 
 		// stop Spark
