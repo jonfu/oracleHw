@@ -75,6 +75,13 @@ object Exercise {
 		
 		println("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
 		
+		result.append("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
+		result.append("symbolCounts.take(10) is " + symbolCounts.take(10).foreach(println) )
+		
+				// save any results ... example follows
+		HdfsUtils.putHdfsFileText ( options.outputPath + "/" + "test.txt",
+			spark.hadoopConfiguration, result.toString, true )
+		
 		symbolCounts.foreach{ symbolCountPair => 
 		  
 		  result.append("#Closed Price\n")
