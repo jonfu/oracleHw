@@ -78,6 +78,9 @@ object Exercise {
 		  result.append("#Closed Price\n")
 		  printStatHeader
 		  result.append(symbolCountPair._1 + "\t")
+		  
+		  println("symbolCountPair._1 is " + symbolCountPair._1 + ", stockTuples.first is " + stockTuples.first)
+		  
 		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbolCountPair._1))
 		  var sortedCloseByDate = symbolFilteredTuples.map(tuple=>(tuple(1),tuple(5).toDouble)).sortByKey(true).map(dateClosePair=>dateClosePair._2)
 		  var sortedCloseByDateArray = sortedCloseByDate.collect
