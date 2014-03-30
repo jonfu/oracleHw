@@ -76,16 +76,21 @@ object Exercise {
 		println("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
 		
 		result.append("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
-		result.append("symbolCounts.take(10) is " + symbolCounts.take(10).foreach(println) )
 		
-				// save any results ... example follows
-		HdfsUtils.putHdfsFileText ( options.outputPath + "/" + "test.txt",
-			spark.hadoopConfiguration, result.toString, true )
+
 		
-		symbolCounts.foreach{ symbolCountPair => 
+		symbolCounts.foreach{ symbolCountPair => {
 		  
 		  result.append("#Closed Price\n")
 		  printStatHeader
+		  
+		  result.append("symbolCountPair is " + symbolCountPair + "\t")
+		  
+		  				// save any results ... example follows
+		HdfsUtils.putHdfsFileText ( options.outputPath + "/" + "test.txt",
+			spark.hadoopConfiguration, result.toString, true )
+		  
+		  
 		  result.append(symbolCountPair._1 + "\t")
 		  
 		  println("symbolCountPair._1 is " + symbolCountPair._1 + ", stockTuples.first is " + stockTuples.first)
@@ -103,6 +108,7 @@ object Exercise {
 		      +"\t"+ iqr(sortedCloseByDateArray) + "\n"
 		  )
 
+		 }
 		}		
 		  		
 		  		
