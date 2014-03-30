@@ -87,28 +87,9 @@ object Exercise {
 		  printStatHeader
 		  
 		  result.append("symbolCountPair is " + symbolCountPair + "\t")
+
 		  
-		  				// save any results ... example follows
-		HdfsUtils.putHdfsFileText ( options.outputPath + "/" + "test.txt",
-			spark.hadoopConfiguration, result.toString, true )
-		  
-		  
-		  result.append(symbolCountPair._1 + "\t")
-		  
-		  println("symbolCountPair._1 is " + symbolCountPair._1 + ", stockTuples.first is " + stockTuples.first)
-		  
-		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbolCountPair._1))
-		  var sortedCloseByDate = symbolFilteredTuples.map(tuple=>(tuple(1),tuple(5).toDouble)).sortByKey(true).map(dateClosePair=>dateClosePair._2)
-		  //var sortedCloseByDateArray = sortedCloseByDate.collect
-		  //var descStatClose = new DescriptiveStatistics(sortedCloseByDateArray)
-		  var rddFuncClose = new DoubleRDDFunctions(sortedCloseByDate)
-		  
-		  //result.append(descStatClose.getMin +"\t"+ descStatClose.getMax +"\t"+ symbolCountPair._2 
-		  result.append(10 +"\t"+ 30 +"\t"+ symbolCountPair._2 
-		      +"\t"+ rddFuncClose.mean +"\t"+ mode(sortedCloseByDate) //+"\t"+ median(sortedCloseByDateArray) 
-		      +"\t"+ rddFuncClose.variance +"\t"+ rddFuncClose.stdev //+"\t"+ descStatClose.getKurtosis()
-		      //+"\t"+ iqr(sortedCloseByDateArray) + "\n"
-		  )
+
 
 
 		}		
