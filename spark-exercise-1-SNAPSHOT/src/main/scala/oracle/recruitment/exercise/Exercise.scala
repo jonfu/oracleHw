@@ -77,9 +77,11 @@ object Exercise {
 		
 		result.append("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
 		
+		result.append(symbolCounts.take(5))
+		
 
 		
-		symbolCounts.foreach{ symbolCountPair => {
+		for (symbolCountPair <- symbolCounts) {
 		  
 		  result.append("#Closed Price\n")
 		  printStatHeader
@@ -108,7 +110,7 @@ object Exercise {
 		      +"\t"+ iqr(sortedCloseByDateArray) + "\n"
 		  )
 
-		 }
+
 		}		
 		  		
 		  		
