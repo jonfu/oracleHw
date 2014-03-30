@@ -8,6 +8,9 @@ import oracle.recruitment.util.{HdfsUtils, Options}
 
 // These will be useful
 import org.apache.spark.rdd.RDD
+import org.apache.spark.rdd.DoubleRDDFunctions
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics
+import org.apache.commons.math.stat.correlation.PearsonsCorrelation
 import scala.collection.JavaConversions._
 import scala.io.Source
 
@@ -62,13 +65,47 @@ object Exercise {
 	
 
 		//First, we load the file and strip off the header "Sym,Date,Open,High,Low,Close,Volume,Adjusted"
-		var stockFile = spark.textFile(options.inputPath).filter(line=> !line.contains("Sym"))		
+		var stockFile = spark.textFile(options.inputPath).filter(line=> !line.contains("Sym"))
 		
+		//Now, transform it into tuples and cache it
+		var stockTuples = stockFile.map(line=>line.split(",")).cache
 		
-				result.append("#Closed Price\n")
-		  printStatHeader
+		//Produce RDD[(String, Int)] where the key is an unique symbol, and value is the count
+		var symbolCounts = stockTuples.map(line=>(line(0),1)).reduceByKey(_+_)
+		
+		for(symbolCountPair <- symbolCounts){
 		  
-		  		result.append("\n")
+		  result.append("#Closed Price\n")
+		  printStatHeader
+		  result.append(symbolCountPair._1 + "\t")
+		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbolCountPair._1))
+		  var sortedCloseByDate = symbolFilteredTuples.map(tuple=>(tuple(1),tuple(5).toDouble)).sortByKey(true).map(dateClosePair=>dateClosePair._2)
+		  var sortedCloseByDateArray = sortedCloseByDate.collect
+		  //var descStatClose = new DescriptiveStatistics(sortedCloseByDateArray)
+		  var rddFuncClose = new DoubleRDDFunctions(sortedCloseByDate)
+		  
+		  //result.append(descStatClose.getMin +"\t"+ descStatClose.getMax +"\t"+ symbolCountPair._2 
+		  result.append(10 +"\t"+ 30 +"\t"+ symbolCountPair._2 
+		      +"\t"+ rddFuncClose.mean +"\t"+ mode(sortedCloseByDate) +"\t"+ median(sortedCloseByDateArray) 
+		      +"\t"+ rddFuncClose.variance +"\t"+ rddFuncClose.stdev //+"\t"+ descStatClose.getKurtosis()
+		      +"\t"+ iqr(sortedCloseByDateArray) + "\n"
+		  )
+
+		}		
+		  		
+		  		
+		  		
+		  		
+		  		
+		  		
+		  		
+		  		
+		  		
+		  		
+		  		
+		  		
+		  		
+		  		
 
 		
 		result.append("File count is ")
@@ -107,6 +144,13 @@ object Exercise {
 	     (acc, add) => (add + acc.head) :: acc 
 	   }).reverse
 	   res
+	}
+	
+	def descriptiveStatistics(xs: Array[Double]) : DescriptiveStatistics = {
+		val sd = new DescriptiveStatistics
+		for (i<-0 until xs.length)
+		  sd.addValue(xs(i))
+		sd
 	}	
 	
 	
