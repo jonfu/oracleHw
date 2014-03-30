@@ -73,7 +73,9 @@ object Exercise {
 		//Produce RDD[(String, Int)] where the key is an unique symbol, and value is the count
 		var symbolCounts = stockTuples.map(line=>(line(0),1)).reduceByKey(_+_)
 		
-		for(symbolCountPair <- symbolCounts){
+		println("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
+		
+		symbolCounts.foreach{ symbolCountPair => 
 		  
 		  result.append("#Closed Price\n")
 		  printStatHeader
