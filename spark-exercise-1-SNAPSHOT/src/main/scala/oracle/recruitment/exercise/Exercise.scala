@@ -76,6 +76,7 @@ object Exercise {
 		println("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
 		
 		symbolCounts.take(symbolCounts.count.toInt).foreach{ case(symbol, count) =>
+		  println("start calculation closed price stats for " + symbol)
 		  result.append("#Closed Price\n")
 		  printStatHeader
 		  result.append(symbol + "\t")
@@ -89,6 +90,7 @@ object Exercise {
 		      +"\t"+ rddFuncClose.variance +"\t"+ rddFuncClose.stdev +"\t"+ descStatClose.getKurtosis()
 		      +"\t"+ iqr(sortedCloseByDateArray) + "\n"
 		  )
+		  println("printed closed price stats for " + symbol)
 		}	
 		  		
 		  		
