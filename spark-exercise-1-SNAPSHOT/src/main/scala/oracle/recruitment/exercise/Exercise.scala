@@ -82,12 +82,14 @@ object Exercise {
 		  printStatsHeader
 		  volumeMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 6, symbolCounts(i)._2, result)
 		}
+		result.append("#### FYI ######\n" + closePriceMatrix(3));
+		result.append("#### FYI ######\n" + closePriceMatrix);
 		
 		result.append("[ Pearson product-moment correlation coefficients of Close Price among all stocks ]\n\n" )
-		result.append((new PearsonsCorrelation(closePriceMatrix)).getCorrelationMatrix() + "\n\n\n\n");
+		result.append((new PearsonsCorrelation(closePriceMatrix)).getCorrelationMatrix() + "\n\n\n\n")
 		
 		result.append("[ Pearson product-moment correlation coefficients of Volume among all stocks ]\n\n" )
-		result.append((new PearsonsCorrelation(volumeMatrix)).getCorrelationMatrix() + "\n\n\n\n");
+		result.append((new PearsonsCorrelation(volumeMatrix)).getCorrelationMatrix() + "\n\n\n\n")
 
 		// save any results ... example follows
 		HdfsUtils.putHdfsFileText ( options.outputPath + "/" + "test.txt",
@@ -142,9 +144,9 @@ object Exercise {
 		      +"\t"+ rddFuncTuple.variance +"\t"+ rddFuncTuple.stdev +"\t"+ descStatTuple.getKurtosis()
 		      +"\t"+ iqr(sortedTupleByDateArray) + "\n\n"
 		  )
-		  result.append("histogram, 20 buckets, in [lower-bound, upper-bound), frequency  \n")
+		  result.append("histogram, 25 buckets, in [lower-bound, upper-bound), frequency  \n")
 		  try {
-			  val hist = rddFuncTuple.histogram(20)
+			  val hist = rddFuncTuple.histogram(25)
 			  for (i <- 0 until hist._2.length) {
 			    result.append(hist._1(i) + "\t" + hist._1(i+1) + "\t" + hist._2(i) + "\n")
 			  }
