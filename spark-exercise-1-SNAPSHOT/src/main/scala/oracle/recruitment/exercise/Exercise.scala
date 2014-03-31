@@ -46,6 +46,7 @@ class MyOptions (args: Array[String]) extends Options {
 
 
 object Exercise {
+  
 	def main ( args: Array[String] ) {
 
 		// options
@@ -56,13 +57,6 @@ object Exercise {
 
 		// YOUR CONTRIBUTION HERE...
 		
-		
-		var result = new StringBuilder
-		//var result2 = new StringBuilder
-		def printStatsHeader(): Unit = { result.append("minimum\tmaximum\tcount\tmean\tmode\tmedian\tvariance\tstandard deviation\tkurtosis\tIQR\n") }
-		
-
-	
 
 		//First, we load the file and strip off the header "Sym,Date,Open,High,Low,Close,Volume,Adjusted"
 		var stocksFile = spark.textFile(options.inputPath).filter(line=> !line.contains("Sym"))
@@ -77,7 +71,7 @@ object Exercise {
 		var volumeMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCounts.length)
 
 		
-		//For each of the unique symbol, calculate the required statistics
+		//For each of the unique symbol, calculate the required statistics, and fill the matrices appropriately
 		for (i<- 0 until symbolCounts.length) {
 		  result.append("[ Close Price statistics for " + symbolCounts(0)._1 + " ]\n\n")
 		  printStatsHeader
@@ -106,6 +100,8 @@ object Exercise {
 	
 	// Homework Helper functions
 	
+	var result = new StringBuilder
+
 	def mode(xs: RDD[Double]) : Double = xs.map(value=>(value, 1)).reduceByKey(_+_).map(pair=>pair.swap).sortByKey(false).first._2
 	
 	def median(xs: Array[Double]): Double = xs(xs.size / 2)
@@ -164,5 +160,6 @@ object Exercise {
 		  sortedTupleByDateArray
 	}
 	
-	
+	def printStatsHeader(): Unit = { result.append("minimum\tmaximum\tcount\tmean\tmode\tmedian\tvariance\tstandard deviation\tkurtosis\tIQR\n") }
+
 }
