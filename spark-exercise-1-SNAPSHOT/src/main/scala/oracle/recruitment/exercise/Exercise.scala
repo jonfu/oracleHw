@@ -9,8 +9,8 @@ import oracle.recruitment.util.{HdfsUtils, Options}
 // These will be useful
 import org.apache.spark.rdd.RDD
 import org.apache.spark.rdd.DoubleRDDFunctions
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics
-import org.apache.commons.math.stat.correlation.PearsonsCorrelation
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation
 import scala.collection.JavaConversions._
 import scala.io.Source
 
@@ -125,18 +125,11 @@ object Exercise {
 	   res
 	}
 	
-	def descriptiveStatistics(xs: Array[Double]) : DescriptiveStatistics = {
-		val sd = new DescriptiveStatistics
-		for (i<-0 until xs.length)
-		  sd.addValue(xs(i))
-		sd
-	}
-	
 	def calculateRequiredStats(tuples: RDD[Array[String]], tupleIndex: Int, count: Int, result: StringBuilder ) : Array[Double] = {
 	      //tuple(1) is date in YYYY-MM-DD, we use as key and sort it by key
 		  var sortedTupleByDate = tuples.map(tuple=>(tuple(1),tuple(tupleIndex).toDouble)).sortByKey(true).map(dateTuplePair=>dateTuplePair._2)
 		  var sortedTupleByDateArray = sortedTupleByDate.collect
-		  var descStatTuple = descriptiveStatistics(sortedTupleByDateArray)
+		  var descStatTuple = new DescriptiveStatistics(sortedTupleByDateArray)
 		  var rddFuncTuple = new DoubleRDDFunctions(sortedTupleByDate)
 		  result.append(descStatTuple.getMin +"\t"+ descStatTuple.getMax +"\t"+ count 
 		      +"\t"+ rddFuncTuple.mean +"\t"+ mode(sortedTupleByDate) +"\t"+ median(sortedTupleByDateArray) 
