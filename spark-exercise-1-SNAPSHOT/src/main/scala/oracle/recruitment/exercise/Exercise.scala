@@ -157,6 +157,18 @@ object Exercise {
 		      +"\t"+ rddFuncTuple.variance +"\t"+ rddFuncTuple.stdev +"\t"+ descStatTuple.getKurtosis()
 		      +"\t"+ iqr(sortedTupleByDateArray) + "\n\n"
 		  )
+		  println("histogram() DEBUG")
+		  rddFuncTuple.histogram(1)
+		  println("histogram(1) success")
+		  rddFuncTuple.histogram(2)
+		  println("histogram(2) success")
+		  rddFuncTuple.histogram(5)
+		  println("histogram(5) success")
+		  rddFuncTuple.histogram(10)
+		  println("histogram(10) success")
+		  rddFuncTuple.histogram(20)
+		  println("histogram(20) success")		  
+		  
 		  result.append("histogram of frequency (20 buckets)\n")
 		  val hist = rddFuncTuple.histogram(10)
 		  //println(hist)
