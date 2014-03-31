@@ -72,24 +72,17 @@ object Exercise {
 		var volumeMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCount)
 		var matrixIdx = 0
 
-		
 		//For each of the unique symbol, calculate the required statistics, and fill the matrices appropriately
 		symbolCounts.take(symbolCount).foreach{ case(symbol, count) =>
 		  result.append("[ Close Price statistics for " + symbol + " ]\n\n")
 		  printStatsHeader
-		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbol))
+		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbol)).cache
 		  closePriceMatrix(matrixIdx) = calculateRequiredStats(symbolFilteredTuples, 5, count, result)
-		  
 		  result.append("[ Volume statistics for " + symbol + " ]\n\n")
 		  printStatsHeader
 		  volumeMatrix(matrixIdx) = calculateRequiredStats(symbolFilteredTuples, 6, count, result)
 		  matrixIdx += 1
 		}
-		result.append("#### FYI closePriceMatrix(0) ######" + closePriceMatrix(0).length + "/" + closePriceMatrix(0).last + closePriceMatrix(0)(0) + closePriceMatrix(0)(1) + " \n");
-		result.append("#### FYI closePriceMatrix(1) ######" + closePriceMatrix(1).length + "/" + closePriceMatrix(1).last + closePriceMatrix(1)(0) + closePriceMatrix(1)(1) + " \n");
-		result.append("#### FYI closePriceMatrix(2) ######" + closePriceMatrix(2).length + "/" + closePriceMatrix(2).last + closePriceMatrix(2)(0) + closePriceMatrix(2)(1) + " \n");
-		result.append("#### FYI closePriceMatrix(3) ######" + closePriceMatrix(3).length + "/" + closePriceMatrix(3).last + closePriceMatrix(3)(0) + closePriceMatrix(3)(1) + " \n");
-
 		
 		result.append("[ Pearson product-moment correlation coefficients of Close Price among all stocks ]\n\n" )
 		result.append((new PearsonsCorrelation(closePriceMatrix)).getCorrelationMatrix() + "\n\n\n\n")
@@ -150,9 +143,9 @@ object Exercise {
 		      +"\t"+ rddFuncTuple.variance +"\t"+ rddFuncTuple.stdev +"\t"+ descStatTuple.getKurtosis()
 		      +"\t"+ iqr(sortedTupleByDateArray) + "\n\n"
 		  )
-		  result.append("histogram, 25 buckets, in [lower-bound, upper-bound), frequency  \n")
+		  result.append("histogram, 30 buckets, in [lower-bound, upper-bound), frequency  \n")
 		  try {
-			  val hist = rddFuncTuple.histogram(25)
+			  val hist = rddFuncTuple.histogram(30)
 			  for (i <- 0 until hist._2.length) {
 			    result.append(hist._1(i) + "\t" + hist._1(i+1) + "\t" + hist._2(i) + "\n")
 			  }
