@@ -70,41 +70,30 @@ object Exercise {
 		//Now, transform it into tuples and cache it
 		var stockTuples = stocksFile.map(line=>line.split(",")).cache
 		
-		//Produce RDD[(String, Int)] where the key is an unique symbol, and value is the count
-		var symbolCounts = stockTuples.map(line=>(line(0),1)).reduceByKey(_+_)
+		//Produce RDD[(String, Int)] where the key is an unique symbol, and value is the count, then collect its array
+		var symbolCounts = stockTuples.map(line=>(line(0),1)).reduceByKey(_+_).collect
+		  
+		var closePriceMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCounts.length)
+		var volumeMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCounts.length)
+
 		
 		//For each of the unique symbol, calculate the required statistics
-		symbolCounts.take(symbolCounts.count.toInt).foreach{ case(symbol, count) =>
-		  result.append("[ Closed Price statistics for " + symbol + " ]\n\n")
+		for (i<- 0 until symbolCounts.length) {
+		  result.append("[ Close Price statistics for " + symbolCounts(0)._1 + " ]\n\n")
 		  printStatsHeader
-		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbol)).cache
-		  calculateRequiredStats(symbolFilteredTuples, 5, count, result)
+		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbolCounts(0)._1)).cache
+		  closePriceMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 5, symbolCounts(0)._2, result)
 		  
-		  result.append("[ Volume statistics for " + symbol + " ]\n\n")
+		  result.append("[ Volume statistics for " + symbolCounts(0)._1 + " ]\n\n")
 		  printStatsHeader
-		  calculateRequiredStats(symbolFilteredTuples, 6, count, result)
-
-		}	
-		  		
-		  		
-		  		
-		  		
-		  		
-		  		
-		  		
-		  		
-		  		
-		  		
-		  		
-		  		
-		  		
-		  		
-
+		  volumeMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 6, symbolCounts(0)._2, result)
+		}
 		
-		result.append("File count is ")
-		result.append(stocksFile.count)
-
-
+		result.append("[ Pearson product-moment correlation coefficients of Close Price among all stocks ]\n\n" )
+		result.append((new PearsonsCorrelation(closePriceMatrix)).getCorrelationMatrix() + "\n\n\n\n");
+		
+		result.append("[ Pearson product-moment correlation coefficients of Volume among all stocks ]\n\n" )
+		result.append((new PearsonsCorrelation(volumeMatrix)).getCorrelationMatrix() + "\n\n\n\n");
 
 		// save any results ... example follows
 		HdfsUtils.putHdfsFileText ( options.outputPath + "/" + "test.txt",
@@ -146,7 +135,7 @@ object Exercise {
 		sd
 	}
 	
-	def calculateRequiredStats(tuples: RDD[Array[String]], tupleIndex: Int, count: Int, result: StringBuilder ) : Unit = {
+	def calculateRequiredStats(tuples: RDD[Array[String]], tupleIndex: Int, count: Int, result: StringBuilder ) : Array[Double] = {
 	      //tuple(1) is date in YYYY-MM-DD, we use as key and sort it by key
 		  var sortedTupleByDate = tuples.map(tuple=>(tuple(1),tuple(tupleIndex).toDouble)).sortByKey(true).map(dateTuplePair=>dateTuplePair._2)
 		  var sortedTupleByDateArray = sortedTupleByDate.collect
@@ -157,21 +146,22 @@ object Exercise {
 		      +"\t"+ rddFuncTuple.variance +"\t"+ rddFuncTuple.stdev +"\t"+ descStatTuple.getKurtosis()
 		      +"\t"+ iqr(sortedTupleByDateArray) + "\n\n"
 		  )
-		  result.append("histogram, 20 buckets, in (value, frequency)  \n")
+		  result.append("histogram, 20 buckets, in [lower-bound, upper-bound), frequency  \n")
 		  try {
 			  val hist = rddFuncTuple.histogram(20)
-			  for (i <- 0 until hist._1.length) {
-			    result.append(hist._1(i) + "\t" + hist._2(i) + "\n")
+			  for (i <- 0 until hist._2.length) {
+			    result.append(hist._1(i) + "\t" + hist._1(i+1) + "\t" + hist._2(i) + "\n")
 			  }
 			  result.append("\n")
 		  } catch {
 	         case ex: Exception =>{
-	            result.append("*** Please submit a bug report to Spark 0.9.0, or use a different bucket value - " + ex + "\n\n")
+	            result.append("*** Please submit a bug report to Spark 0.9.0 on DoubleRDDFunctions.histogram(bucketCount: Int), or use a different bucketCount value - " + ex + "\n\n")
 	         }
 	      }
 		  result.append("3 day moving average\n")
 		  movingAverage(sortedTupleByDateArray, 3).foreach(movingAve=>result.append(movingAve+"\t"))
 		  result.append("\n\n\n\n")
+		  sortedTupleByDateArray
 	}
 	
 	
