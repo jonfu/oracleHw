@@ -65,22 +65,25 @@ object Exercise {
 		var stockTuples = stocksFile.map(line=>line.split(",")).cache
 		
 		//Produce RDD[(String, Int)] where the key is an unique symbol, and value is the count, then collect its array
-		var symbolCounts = stockTuples.map(line=>(line(0),1)).reduceByKey(_+_).collect
+		var symbolCounts = stockTuples.map(line=>(line(0),1)).reduceByKey(_+_)
+		var symbolCount = symbolCounts.count.toInt
 		  
-		var closePriceMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCounts.length)
-		var volumeMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCounts.length)
+		var closePriceMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCount)
+		var volumeMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCount)
+		var matrixIdx = 0
 
 		
 		//For each of the unique symbol, calculate the required statistics, and fill the matrices appropriately
-		for (i<- 0 until symbolCounts.length) {
-		  result.append("[ Close Price statistics for " + symbolCounts(i)._1 + " ]\n\n")
+		symbolCounts.take(symbolCount).foreach{ case(symbol, count) =>
+		  result.append("[ Close Price statistics for " + symbol + " ]\n\n")
 		  printStatsHeader
-		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbolCounts(i)._1))
-		  closePriceMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 5, symbolCounts(i)._2, result)
+		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbol))
+		  closePriceMatrix(matrixIdx) = calculateRequiredStats(symbolFilteredTuples, 5, count, result)
 		  
-		  result.append("[ Volume statistics for " + symbolCounts(i)._1 + " ]\n\n")
+		  result.append("[ Volume statistics for " + symbol + " ]\n\n")
 		  printStatsHeader
-		  volumeMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 6, symbolCounts(i)._2, result)
+		  volumeMatrix(matrixIdx) = calculateRequiredStats(symbolFilteredTuples, 6, count, result)
+		  matrixIdx += 1
 		}
 		result.append("#### FYI closePriceMatrix(0) ######" + closePriceMatrix(0).length + "/" + closePriceMatrix(0).last + closePriceMatrix(0)(0) + closePriceMatrix(0)(1) + " \n");
 		result.append("#### FYI closePriceMatrix(1) ######" + closePriceMatrix(1).length + "/" + closePriceMatrix(1).last + closePriceMatrix(1)(0) + closePriceMatrix(1)(1) + " \n");
