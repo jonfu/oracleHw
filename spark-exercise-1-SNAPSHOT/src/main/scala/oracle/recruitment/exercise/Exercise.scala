@@ -157,7 +157,12 @@ object Exercise {
 		      +"\t"+ rddFuncTuple.variance +"\t"+ rddFuncTuple.stdev +"\t"+ descStatTuple.getKurtosis()
 		      +"\t"+ iqr(sortedTupleByDateArray) + "\n\n"
 		  )
-		  result.append("histogram of frequency (20 buckets)\n" + rddFuncTuple.histogram(20) + "\n\n")
+		  result.append("histogram of frequency (20 buckets)\n")
+		  val hist = rddFuncTuple.histogram(20)
+		  //println(hist)
+		  println(hist._1)
+		  println(hist._2)
+		  result.append("1 length is " + hist._1.length + ", 2 length is " + hist._2.length )
 		  result.append("3 day moving average\n" + movingAverage(sortedTupleByDateArray, 3) + "\n\n\n\n")
 	}
 	
