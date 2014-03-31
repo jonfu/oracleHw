@@ -75,17 +75,17 @@ object Exercise {
 		for (i<- 0 until symbolCounts.length) {
 		  result.append("[ Close Price statistics for " + symbolCounts(i)._1 + " ]\n\n")
 		  printStatsHeader
-		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbolCounts(i)._1)).cache
+		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbolCounts(i)._1))
 		  closePriceMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 5, symbolCounts(i)._2, result)
 		  
 		  result.append("[ Volume statistics for " + symbolCounts(i)._1 + " ]\n\n")
 		  printStatsHeader
 		  volumeMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 6, symbolCounts(i)._2, result)
 		}
-		result.append("#### FYI closePriceMatrix(0) ######" + closePriceMatrix(0).length + "/" + closePriceMatrix(0).last + " \n");
-		result.append("#### FYI closePriceMatrix(1) ######" + closePriceMatrix(1).length + "/" + closePriceMatrix(1).last + " \n");
-		result.append("#### FYI closePriceMatrix(2) ######" + closePriceMatrix(2).length + "/" + closePriceMatrix(2).last + " \n");
-		result.append("#### FYI closePriceMatrix(3) ######" + closePriceMatrix(3).length + "/" + closePriceMatrix(3).last + " \n");
+		result.append("#### FYI closePriceMatrix(0) ######" + closePriceMatrix(0).length + "/" + closePriceMatrix(0).last + closePriceMatrix(0)(0) + closePriceMatrix(0)(1) + " \n");
+		result.append("#### FYI closePriceMatrix(1) ######" + closePriceMatrix(1).length + "/" + closePriceMatrix(1).last + closePriceMatrix(1)(0) + closePriceMatrix(1)(1) + " \n");
+		result.append("#### FYI closePriceMatrix(2) ######" + closePriceMatrix(2).length + "/" + closePriceMatrix(2).last + closePriceMatrix(2)(0) + closePriceMatrix(2)(1) + " \n");
+		result.append("#### FYI closePriceMatrix(3) ######" + closePriceMatrix(3).length + "/" + closePriceMatrix(3).last + closePriceMatrix(3)(0) + closePriceMatrix(3)(1) + " \n");
 
 		
 		result.append("[ Pearson product-moment correlation coefficients of Close Price among all stocks ]\n\n" )
