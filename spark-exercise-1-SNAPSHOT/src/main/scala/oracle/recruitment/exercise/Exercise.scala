@@ -75,25 +75,20 @@ object Exercise {
 		
 		println("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
 		
-		result.append("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
-		
-		result.append(symbolCounts.take(5).foreach(println))
-		result.append(symbolCounts.foreach(println))
-		
-		symbolCounts.foreach{ case(symbol, count) =>
-		  println("symbol1 is " + symbol + "\t count1 is " + count)
-		  result.append("REALLY?\n")
-		  result.append("symbol1 is " + symbol + "\t count1 is " + count)
-
-		}	
-		
-
-		
-		symbolCounts.take(8).foreach{ case(symbol, count) =>
-		  println("symbol2 is " + symbol + "\t count2 is " + count)
+		symbolCounts.take(symbolCounts.count.toInt).foreach{ case(symbol, count) =>
 		  result.append("#Closed Price\n")
-		  result.append("symbol\tminimum\tmaximum\tcount\tmean\tmode\tmedian\tvariance\tstandard deviation\tkurtosis\tIQR\n")
-		  result.append("symbol2 is " + symbol + "\t count2 is " + count)
+		  printStatHeader
+		  result.append(symbol + "\t")
+		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbol))
+		  var sortedCloseByDate = symbolFilteredTuples.map(tuple=>(tuple(1),tuple(5).toDouble)).sortByKey(true).map(dateClosePair=>dateClosePair._2)
+		  var sortedCloseByDateArray = sortedCloseByDate.collect
+		  var descStatClose = descriptiveStatistics(sortedCloseByDateArray)
+		  var rddFuncClose = new DoubleRDDFunctions(sortedCloseByDate)
+		  result.append(descStatClose.getMin +"\t"+ descStatClose.getMax +"\t"+ count 
+		      +"\t"+ rddFuncClose.mean +"\t"+ mode(sortedCloseByDate) +"\t"+ median(sortedCloseByDateArray) 
+		      +"\t"+ rddFuncClose.variance +"\t"+ rddFuncClose.stdev +"\t"+ descStatClose.getKurtosis()
+		      +"\t"+ iqr(sortedCloseByDateArray) + "\n"
+		  )
 		}	
 		  		
 		  		
