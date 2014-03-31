@@ -82,8 +82,18 @@ object Exercise {
 		  printStatsHeader
 		  volumeMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 6, symbolCounts(i)._2, result)
 		}
-		result.append("#### FYI ######\n" + closePriceMatrix(3));
-		result.append("#### FYI ######\n" + closePriceMatrix);
+		result.append("#### FYI ######\n");
+		closePriceMatrix(0).foreach(value=>result.append(value+"\t"))
+		result.append("#### FYI ######\n");
+		closePriceMatrix(3).foreach(value=>result.append(value+"\t"))
+		result.append("#### FYI ######\n");
+		closePriceMatrix(5).foreach(value=>result.append(value+"\t"))
+		result.append("#### FYI ######\n");
+		volumeMatrix(0).foreach(value=>result.append(value+"\t"))
+		result.append("#### FYI ######\n");
+		volumeMatrix(3).foreach(value=>result.append(value+"\t"))
+		result.append("#### FYI ######\n");
+		volumeMatrix(5).foreach(value=>result.append(value+"\t"))
 		
 		result.append("[ Pearson product-moment correlation coefficients of Close Price among all stocks ]\n\n" )
 		result.append((new PearsonsCorrelation(closePriceMatrix)).getCorrelationMatrix() + "\n\n\n\n")
