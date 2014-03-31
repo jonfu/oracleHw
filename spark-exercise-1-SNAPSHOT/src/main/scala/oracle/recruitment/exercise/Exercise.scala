@@ -59,16 +59,16 @@ object Exercise {
 		
 		var result = new StringBuilder
 		//var result2 = new StringBuilder
-		def printStatHeader(): Unit = { result.append("symbol\tminimum\tmaximum\tcount\tmean\tmode\tmedian\tvariance\tstandard deviation\tkurtosis\tIQR\n") }
+		def printStatHeader(): Unit = { result.append("minimum\tmaximum\tcount\tmean\tmode\tmedian\tvariance\tstandard deviation\tkurtosis\tIQR\n") }
 		
 
 	
 
 		//First, we load the file and strip off the header "Sym,Date,Open,High,Low,Close,Volume,Adjusted"
-		var stockFile = spark.textFile(options.inputPath).filter(line=> !line.contains("Sym"))
+		var stocksFile = spark.textFile(options.inputPath).filter(line=> !line.contains("Sym"))
 		
 		//Now, transform it into tuples and cache it
-		var stockTuples = stockFile.map(line=>line.split(",")).cache
+		var stockTuples = stocksFile.map(line=>line.split(",")).cache
 		
 		//Produce RDD[(String, Int)] where the key is an unique symbol, and value is the count
 		var symbolCounts = stockTuples.map(line=>(line(0),1)).reduceByKey(_+_)
@@ -76,21 +76,15 @@ object Exercise {
 		println("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
 		
 		symbolCounts.take(symbolCounts.count.toInt).foreach{ case(symbol, count) =>
-		  println("start calculation closed price stats for " + symbol)
-		  result.append("#Closed Price\n")
+		  result.append("[ Closed Price statistics for " + symbol + " ]\n")
 		  printStatHeader
-		  result.append(symbol + "\t")
-		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbol))
-		  var sortedCloseByDate = symbolFilteredTuples.map(tuple=>(tuple(1),tuple(5).toDouble)).sortByKey(true).map(dateClosePair=>dateClosePair._2)
-		  var sortedCloseByDateArray = sortedCloseByDate.collect
-		  var descStatClose = descriptiveStatistics(sortedCloseByDateArray)
-		  var rddFuncClose = new DoubleRDDFunctions(sortedCloseByDate)
-		  result.append(descStatClose.getMin +"\t"+ descStatClose.getMax +"\t"+ count 
-		      +"\t"+ rddFuncClose.mean +"\t"+ mode(sortedCloseByDate) +"\t"+ median(sortedCloseByDateArray) 
-		      +"\t"+ rddFuncClose.variance +"\t"+ rddFuncClose.stdev +"\t"+ descStatClose.getKurtosis()
-		      +"\t"+ iqr(sortedCloseByDateArray) + "\n"
-		  )
-		  println("printed closed price stats for " + symbol)
+		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbol)).cache
+		  calculateRequiredStats(symbolFilteredTuples, 5, count, result)
+		  
+		  result.append("[ Volume statistics for " + symbol + " ]\n")
+		  printStatHeader
+		  calculateRequiredStats(symbolFilteredTuples, 6, count, result)
+
 		}	
 		  		
 		  		
@@ -109,7 +103,7 @@ object Exercise {
 
 		
 		result.append("File count is ")
-		result.append(stockFile.count)
+		result.append(stocksFile.count)
 
 
 
@@ -151,7 +145,19 @@ object Exercise {
 		for (i<-0 until xs.length)
 		  sd.addValue(xs(i))
 		sd
-	}	
+	}
+	
+	def calculateRequiredStats(tuples: RDD[Array[String]], tupleIndex: Int, count: Int, result: StringBuilder ) : Unit = {
+		  var sortedCloseByDate = tuples.map(tuple=>(tuple(1),tuple(tupleIndex).toDouble)).sortByKey(true).map(dateClosePair=>dateClosePair._2)
+		  var sortedCloseByDateArray = sortedCloseByDate.collect
+		  var descStatClose = descriptiveStatistics(sortedCloseByDateArray)
+		  var rddFuncClose = new DoubleRDDFunctions(sortedCloseByDate)
+		  result.append(descStatClose.getMin +"\t"+ descStatClose.getMax +"\t"+ count 
+		      +"\t"+ rddFuncClose.mean +"\t"+ mode(sortedCloseByDate) +"\t"+ median(sortedCloseByDateArray) 
+		      +"\t"+ rddFuncClose.variance +"\t"+ rddFuncClose.stdev +"\t"+ descStatClose.getKurtosis()
+		      +"\t"+ iqr(sortedCloseByDateArray) + "\n\n"
+		  )
+	}
 	
 	
 }
