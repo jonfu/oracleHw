@@ -84,11 +84,11 @@ object Exercise {
 		  matrixIdx += 1
 		}
 		
-		result.append("[ Pearson product-moment correlation coefficients of Close Price among all stocks ]\n\n" )
-		result.append((new PearsonsCorrelation(closePriceMatrix)).getCorrelationMatrix() + "\n\n\n\n")
+		result.append("[ Pearson product-moment correlation coefficients of Close Price among all stocks ]\n" )
+		result.append((new PearsonsCorrelation(closePriceMatrix)).getCorrelationMatrix() + "\n\n")
 		
-		result.append("[ Pearson product-moment correlation coefficients of Volume among all stocks ]\n\n" )
-		result.append((new PearsonsCorrelation(volumeMatrix)).getCorrelationMatrix() + "\n\n\n\n")
+		result.append("[ Pearson product-moment correlation coefficients of Volume among all stocks ]\n" )
+		result.append((new PearsonsCorrelation(volumeMatrix)).getCorrelationMatrix() + "\n\n")
 
 		// save any results ... example follows
 		HdfsUtils.putHdfsFileText ( options.outputPath + "/" + "test.txt",
@@ -150,7 +150,7 @@ object Exercise {
 	      }
 		  result.append("3 day moving average\n")
 		  movingAverage(sortedTupleByDateArray, 3).foreach(movingAve=>result.append(movingAve+"\t"))
-		  result.append("\n\n\n\n")
+		  result.append("\n\n\n")
 		  sortedTupleByDateArray
 	}
 	
