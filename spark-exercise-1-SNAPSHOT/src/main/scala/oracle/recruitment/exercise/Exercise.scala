@@ -59,7 +59,7 @@ object Exercise {
 		
 		var result = new StringBuilder
 		//var result2 = new StringBuilder
-		def printStatHeader(): Unit = { result.append("minimum\tmaximum\tcount\tmean\tmode\tmedian\tvariance\tstandard deviation\tkurtosis\tIQR\n") }
+		def printStatsHeader(): Unit = { result.append("minimum\tmaximum\tcount\tmean\tmode\tmedian\tvariance\tstandard deviation\tkurtosis\tIQR\n") }
 		
 
 	
@@ -73,16 +73,15 @@ object Exercise {
 		//Produce RDD[(String, Int)] where the key is an unique symbol, and value is the count
 		var symbolCounts = stockTuples.map(line=>(line(0),1)).reduceByKey(_+_)
 		
-		println("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
-		
+		//For each of the unique symbol, calculate the required statistics
 		symbolCounts.take(symbolCounts.count.toInt).foreach{ case(symbol, count) =>
 		  result.append("[ Closed Price statistics for " + symbol + " ]\n\n")
-		  printStatHeader
+		  printStatsHeader
 		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbol)).cache
 		  calculateRequiredStats(symbolFilteredTuples, 5, count, result)
 		  
 		  result.append("[ Volume statistics for " + symbol + " ]\n\n")
-		  printStatHeader
+		  printStatsHeader
 		  calculateRequiredStats(symbolFilteredTuples, 6, count, result)
 
 		}	
@@ -148,6 +147,7 @@ object Exercise {
 	}
 	
 	def calculateRequiredStats(tuples: RDD[Array[String]], tupleIndex: Int, count: Int, result: StringBuilder ) : Unit = {
+	      //tuple(1) is date in YYYY-MM-DD, we use as key and sort it by key
 		  var sortedTupleByDate = tuples.map(tuple=>(tuple(1),tuple(tupleIndex).toDouble)).sortByKey(true).map(dateTuplePair=>dateTuplePair._2)
 		  var sortedTupleByDateArray = sortedTupleByDate.collect
 		  var descStatTuple = descriptiveStatistics(sortedTupleByDateArray)
@@ -157,8 +157,8 @@ object Exercise {
 		      +"\t"+ rddFuncTuple.variance +"\t"+ rddFuncTuple.stdev +"\t"+ descStatTuple.getKurtosis()
 		      +"\t"+ iqr(sortedTupleByDateArray) + "\n\n"
 		  )
-		  result.append("histogram of frequency (20 buckets)\n" + rddFuncTuple.histogram(20) + "\n\n");
-		  result.append("3 day moving average\n" + movingAverage(sortedTupleByDateArray, 3) + "\n\n\n\n");
+		  result.append("histogram of frequency (20 buckets)\n" + rddFuncTuple.histogram(20) + "\n\n")
+		  result.append("3 day moving average\n" + movingAverage(sortedTupleByDateArray, 3) + "\n\n\n\n")
 	}
 	
 	
