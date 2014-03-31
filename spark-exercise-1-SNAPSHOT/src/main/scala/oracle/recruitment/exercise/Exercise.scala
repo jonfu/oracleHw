@@ -143,9 +143,9 @@ object Exercise {
 		      +"\t"+ rddFuncTuple.variance +"\t"+ rddFuncTuple.stdev +"\t"+ descStatTuple.getKurtosis()
 		      +"\t"+ iqr(sortedTupleByDateArray) + "\n\n"
 		  )
-		  result.append("histogram, 30 buckets, in [lower-bound, upper-bound), frequency  \n")
+		  result.append("histogram<20-bucket> in [lower-bound, upper-bound), frequency  \n")
 		  try {
-			  val hist = rddFuncTuple.histogram(30)
+			  val hist = rddFuncTuple.histogram(20)
 			  for (i <- 0 until hist._2.length) {
 			    result.append(hist._1(i) + "\t" + hist._1(i+1) + "\t" + hist._2(i) + "\n")
 			  }
