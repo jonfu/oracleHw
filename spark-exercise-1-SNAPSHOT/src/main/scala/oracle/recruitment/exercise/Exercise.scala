@@ -148,15 +148,16 @@ object Exercise {
 	}
 	
 	def calculateRequiredStats(tuples: RDD[Array[String]], tupleIndex: Int, count: Int, result: StringBuilder ) : Unit = {
-		  var sortedCloseByDate = tuples.map(tuple=>(tuple(1),tuple(tupleIndex).toDouble)).sortByKey(true).map(dateClosePair=>dateClosePair._2)
-		  var sortedCloseByDateArray = sortedCloseByDate.collect
-		  var descStatClose = descriptiveStatistics(sortedCloseByDateArray)
-		  var rddFuncClose = new DoubleRDDFunctions(sortedCloseByDate)
-		  result.append(descStatClose.getMin +"\t"+ descStatClose.getMax +"\t"+ count 
-		      +"\t"+ rddFuncClose.mean +"\t"+ mode(sortedCloseByDate) +"\t"+ median(sortedCloseByDateArray) 
-		      +"\t"+ rddFuncClose.variance +"\t"+ rddFuncClose.stdev +"\t"+ descStatClose.getKurtosis()
-		      +"\t"+ iqr(sortedCloseByDateArray) + "\n\n"
+		  var sortedTupleByDate = tuples.map(tuple=>(tuple(1),tuple(tupleIndex).toDouble)).sortByKey(true).map(dateTuplePair=>dateTuplePair._2)
+		  var sortedTupleByDateArray = sortedTupleByDate.collect
+		  var descStatTuple = descriptiveStatistics(sortedTupleByDateArray)
+		  var rddFuncTuple = new DoubleRDDFunctions(sortedTupleByDate)
+		  result.append(descStatTuple.getMin +"\t"+ descStatTuple.getMax +"\t"+ count 
+		      +"\t"+ rddFuncTuple.mean +"\t"+ mode(sortedTupleByDate) +"\t"+ median(sortedTupleByDateArray) 
+		      +"\t"+ rddFuncTuple.variance +"\t"+ rddFuncTuple.stdev +"\t"+ descStatTuple.getKurtosis()
+		      +"\t"+ iqr(sortedTupleByDateArray) + "\n"
 		  )
+		  result.append("histogram of frequency (20 buckets)\n" + rddFuncTuple.histogram(20) + "\n\n");
 	}
 	
 	
