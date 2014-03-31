@@ -157,25 +157,21 @@ object Exercise {
 		      +"\t"+ rddFuncTuple.variance +"\t"+ rddFuncTuple.stdev +"\t"+ descStatTuple.getKurtosis()
 		      +"\t"+ iqr(sortedTupleByDateArray) + "\n\n"
 		  )
-		  println("histogram() DEBUG")
-		  rddFuncTuple.histogram(1)
-		  println("histogram(1) success")
-		  rddFuncTuple.histogram(2)
-		  println("histogram(2) success")
-		  rddFuncTuple.histogram(5)
-		  println("histogram(5) success")
-		  rddFuncTuple.histogram(10)
-		  println("histogram(10) success")
-		  rddFuncTuple.histogram(20)
-		  println("histogram(20) success")		  
-		  
-		  result.append("histogram of frequency (20 buckets)\n")
-		  val hist = rddFuncTuple.histogram(10)
-		  //println(hist)
-		  println(hist._1)
-		  println(hist._2)
-		  result.append("1 length is " + hist._1.length + ", 2 length is " + hist._2.length )
-		  result.append("3 day moving average\n" + movingAverage(sortedTupleByDateArray, 3) + "\n\n\n\n")
+		  result.append("histogram, 20 buckets, in (value, frequency)  \n")
+		  try {
+			  val hist = rddFuncTuple.histogram(20)
+			  for (i <- 0 until hist._1.length) {
+			    result.append(hist._1(i) + "\t" + hist._2(i) + "\n")
+			  }
+			  result.append("\n")
+		  } catch {
+	         case ex: Exception =>{
+	            result.append("*** Please submit a bug report to Spark 0.9.0, or use a different bucket value - " + ex + "\n\n")
+	         }
+	      }
+		  result.append("3 day moving average\n")
+		  movingAverage(sortedTupleByDateArray, 3).foreach(movingAve=>result.append(movingAve+"\t"))
+		  result.append("\n\n\n\n")
 	}
 	
 	
