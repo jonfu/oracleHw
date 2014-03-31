@@ -158,7 +158,7 @@ object Exercise {
 		      +"\t"+ iqr(sortedTupleByDateArray) + "\n\n"
 		  )
 		  result.append("histogram of frequency (20 buckets)\n")
-		  val hist = rddFuncTuple.histogram(20)
+		  val hist = rddFuncTuple.histogram(10)
 		  //println(hist)
 		  println(hist._1)
 		  println(hist._2)
