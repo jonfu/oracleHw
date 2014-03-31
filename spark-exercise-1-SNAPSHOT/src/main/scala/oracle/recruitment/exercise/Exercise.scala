@@ -73,14 +73,14 @@ object Exercise {
 		
 		//For each of the unique symbol, calculate the required statistics, and fill the matrices appropriately
 		for (i<- 0 until symbolCounts.length) {
-		  result.append("[ Close Price statistics for " + symbolCounts(0)._1 + " ]\n\n")
+		  result.append("[ Close Price statistics for " + symbolCounts(i)._1 + " ]\n\n")
 		  printStatsHeader
-		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbolCounts(0)._1)).cache
-		  closePriceMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 5, symbolCounts(0)._2, result)
+		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbolCounts(i)._1)).cache
+		  closePriceMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 5, symbolCounts(i)._2, result)
 		  
-		  result.append("[ Volume statistics for " + symbolCounts(0)._1 + " ]\n\n")
+		  result.append("[ Volume statistics for " + symbolCounts(i)._1 + " ]\n\n")
 		  printStatsHeader
-		  volumeMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 6, symbolCounts(0)._2, result)
+		  volumeMatrix(i) = calculateRequiredStats(symbolFilteredTuples, 6, symbolCounts(i)._2, result)
 		}
 		
 		result.append("[ Pearson product-moment correlation coefficients of Close Price among all stocks ]\n\n" )
@@ -151,7 +151,7 @@ object Exercise {
 			  result.append("\n")
 		  } catch {
 	         case ex: Exception =>{
-	            result.append("*** Please submit a bug report to Spark 0.9.0 on DoubleRDDFunctions.histogram(bucketCount: Int), or use a different bucketCount value - " + ex + "\n\n")
+	            result.append("*** Please submit a bug report to Spark 0.9.0 on DoubleRDDFunctions.histogram(bucketCount: Int), or use a different bucketCount value (e.g. for fb it needs at least 22 buckets) - " + ex + "\n\n")
 	         }
 	      }
 		  result.append("3 day moving average\n")
