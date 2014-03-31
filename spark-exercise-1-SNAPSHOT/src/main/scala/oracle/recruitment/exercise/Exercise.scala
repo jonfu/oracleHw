@@ -76,12 +76,12 @@ object Exercise {
 		println("symbolCounts is " + symbolCounts + ", count is " + symbolCounts.count)
 		
 		symbolCounts.take(symbolCounts.count.toInt).foreach{ case(symbol, count) =>
-		  result.append("[ Closed Price statistics for " + symbol + " ]\n")
+		  result.append("[ Closed Price statistics for " + symbol + " ]\n\n")
 		  printStatHeader
 		  var symbolFilteredTuples = stockTuples.filter(tuple=>(tuple(0)==symbol)).cache
 		  calculateRequiredStats(symbolFilteredTuples, 5, count, result)
 		  
-		  result.append("[ Volume statistics for " + symbol + " ]\n")
+		  result.append("[ Volume statistics for " + symbol + " ]\n\n")
 		  printStatHeader
 		  calculateRequiredStats(symbolFilteredTuples, 6, count, result)
 
@@ -155,9 +155,10 @@ object Exercise {
 		  result.append(descStatTuple.getMin +"\t"+ descStatTuple.getMax +"\t"+ count 
 		      +"\t"+ rddFuncTuple.mean +"\t"+ mode(sortedTupleByDate) +"\t"+ median(sortedTupleByDateArray) 
 		      +"\t"+ rddFuncTuple.variance +"\t"+ rddFuncTuple.stdev +"\t"+ descStatTuple.getKurtosis()
-		      +"\t"+ iqr(sortedTupleByDateArray) + "\n"
+		      +"\t"+ iqr(sortedTupleByDateArray) + "\n\n"
 		  )
 		  result.append("histogram of frequency (20 buckets)\n" + rddFuncTuple.histogram(20) + "\n\n");
+		  result.append("3 day moving average\n" + movingAverage(sortedTupleByDateArray, 3) + "\n\n\n\n");
 	}
 	
 	
