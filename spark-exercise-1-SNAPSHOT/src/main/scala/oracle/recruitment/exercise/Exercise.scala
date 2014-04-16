@@ -59,17 +59,17 @@ object Exercise {
 		
 
 		//First, we load the file and strip off the header "Sym,Date,Open,High,Low,Close,Volume,Adjusted"
-		var stocksFile = spark.textFile(options.inputPath).filter(line=> !line.contains("Sym"))
+		val stocksFile = spark.textFile(options.inputPath).filter(line=> !line.contains("Sym"))
 		
 		//Now, transform it into tuples and cache it
-		var stockTuples = stocksFile.map(line=>line.split(",")).cache
+		val stockTuples = stocksFile.map(line=>line.split(",")).cache
 		
 		//Produce RDD[(String, Int)] where the key is an unique symbol, and value is the count, then collect its array
-		var symbolCounts = stockTuples.map(line=>(line(0),1)).reduceByKey(_+_)
+		val symbolCounts = stockTuples.map(line=>(line(0),1)).reduceByKey(_+_)
 		var symbolCount = symbolCounts.count.toInt
 		  
-		var closePriceMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCount)
-		var volumeMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCount)
+		val closePriceMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCount)
+		val volumeMatrix : Array[Array[Double]] = new Array[Array[Double]](symbolCount)
 		var matrixIdx = 0
 
 		//For each of the unique symbol, calculate the required statistics, and fill the matrices appropriately
@@ -85,11 +85,11 @@ object Exercise {
 		}
 		
 		result.append("[ Pearson product-moment correlation coefficients of Close Price among all stocks ]\n" )
-		result.append((new PearsonsCorrelation(closePriceMatrix)).getCorrelationMatrix() + "\n\n")
+		result.append(generatePearsonsCorrelationCoefficientMatrix(closePriceMatrix, symbolCount) + "\n\n")
 		
 		result.append("[ Pearson product-moment correlation coefficients of Volume among all stocks ]\n" )
-		result.append((new PearsonsCorrelation(volumeMatrix)).getCorrelationMatrix() + "\n\n")
-
+		result.append(generatePearsonsCorrelationCoefficientMatrix(volumeMatrix, symbolCount) + "\n\n")
+		
 		// save any results ... example follows
 		HdfsUtils.putHdfsFileText ( options.outputPath + "/" + "test.txt",
 			spark.hadoopConfiguration, result.toString, true )
@@ -152,6 +152,21 @@ object Exercise {
 		  movingAverage(sortedTupleByDateArray, 3).foreach(movingAve=>result.append(movingAve+"\t"))
 		  result.append("\n\n\n")
 		  sortedTupleByDateArray
+	}
+	
+	def generatePearsonsCorrelationCoefficientMatrix( twoDimArray: Array[Array[Double]], numSymbols: Int ) : String = {
+	  val matrix = new StringBuilder
+	  val pc = new PearsonsCorrelation
+	  matrix.append("{\n")
+	  for (i <- 0 until numSymbols) {
+	    matrix.append("  {")
+	    for (j <- 0 until numSymbols ) {
+	    	matrix.append(pc.correlation(twoDimArray(i), twoDimArray(j)) + ", ")
+	    }
+	    matrix.append("},\n")
+	  }
+	  matrix.append("}")
+	  matrix.toString
 	}
 	
 	def printStatsHeader(): Unit = { result.append("minimum\tmaximum\tcount\tmean\tmode\tmedian\tvariance\tstandard deviation\tkurtosis\tIQR\n") }
